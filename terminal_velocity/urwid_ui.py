@@ -237,9 +237,10 @@ class NoteFilterListBox(urwid.ListBox):
 class MainFrame(urwid.Frame):
     """The topmost urwid widget."""
 
-    def __init__(self, notes_dir, editor, extension, extensions, exclude=None):
+    def __init__(self, notes_dir, viewer, editor, extension, extensions, exclude=None):
 
         self.editor = editor
+        self.viewer = viewer
         self.notebook = notebook.PlainTextNoteBook(notes_dir, extension,
                 extensions, exclude=exclude)
 
@@ -320,6 +321,9 @@ class MainFrame(urwid.Frame):
             elif self.search_box.edit_text:
                 self.search_box.set_edit_text("")
                 return None
+        elif key in ["v"]:
+            if self.selected_note:
+                system(self.viewer + ' ' + pipes.quote(self.selected_note.abspath), self.loop)
 
         elif key in ["enter"]:
             if self.selected_note:
@@ -433,10 +437,10 @@ class MainFrame(urwid.Frame):
         self.selected_note = note
 
 
-def launch(notes_dir, editor, extension, extensions, exclude=None):
+def launch(notes_dir, viewer, editor, extension, extensions, exclude=None):
     """Launch the user interface."""
 
-    frame = MainFrame(notes_dir, editor, extension, extensions, exclude=exclude)
+    frame = MainFrame(notes_dir, viewer, editor, extension, extensions, exclude=exclude)
     loop = urwid.MainLoop(frame, palette)
     frame.loop = loop
     loop.run()
